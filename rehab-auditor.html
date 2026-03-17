@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        :root { --navy: #1a365d; --green: #2ecc71; --slate: #64748b; --bg: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); padding: 40px; color: #334155; }
+        .container { max-width: 700px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 6px solid var(--navy); }
+        h2 { color: var(--navy); margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed #e2e8f0; }
+        label { font-weight: 600; font-size: 14px; }
+        input { width: 120px; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px; text-align: right; }
+        .result-box { margin-top: 30px; padding: 20px; border-radius: 8px; background: #f1f5f9; }
+        .warning { color: #b91c1c; font-size: 12px; font-weight: 700; margin-top: 4px; display: none; }
+        .total-row { font-size: 20px; font-weight: 800; color: var(--navy); margin-top: 15px; display: flex; justify-content: space-between; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Rehab Budget Auditor (Sec 9c)</h2>
+    <p style="font-size: 13px; color: var(--slate); margin-bottom: 25px;">Enter budget items below. Soft costs and ineligible items will be automatically flagged and excluded from the LTC basis.</p>
+
+    <div class="row">
+        <label>Materials & Labor (Hard Costs)</label>
+        <input type="number" id="hard" value="0" oninput="audit()">
+    </div>
+
+    <div class="row">
+        <div>
+            <label>Permits & Architecture</label>
+            <div class="warning" id="w_permit">Exceeds typical 5% soft cost soft-cap</div>
+        </div>
+        <input type="number" id="soft" value="0" oninput="audit()">
+    </div>
+
+    <div class="row" style="background: #fff5f5;">
+        <div>
+            <label>Interest Carry / Points</label>
+            <div style="font-size: 11px; color: #b91c1c;">INELIGIBLE PER SEC 9c</div>
+        </div>
+        <input type="number" id="ineligible" value="0" oninput="audit()">
+    </div>
+
+    <div class="result-box">
+        <div class="total-row">
+            <span>Total Submitted:</span>
+            <span id="total_sub">$0</span>
+        </div>
+        <div class="total-row" style="color: var(--green);">
+            <span>Eligible Basis:</span>
+            <span id="total_eligible">$0</span>
+        </div>
+        <p id="audit_note" style="font-size: 12px; margin-top: 10px; font-style: italic;"></p>
+    </div>
+    
+    <button onclick="window.location.href='index.html'" style="margin-top:20px; background:none; border:1px solid var(--slate); color:var(--slate); padding:10px; border-radius:6px; cursor:pointer;">← Back to Portal</button>
+</div>
+
+<script>
+function audit() {
+    const hard = parseFloat(document.getElementById('hard').value) || 0;
+    const soft = parseFloat(document.getElementById('soft').value) || 0;
+    const inel = parseFloat(document.getElementById('ineligible').value) || 0;
+
+    const total = hard + soft + inel;
+    const eligible = hard + soft; // Interest carry is excluded
+
+    document.getElementById('total_sub').innerText = '$' + total.toLocaleString();
+    document.getElementById('total_eligible').innerText = '$' + eligible.toLocaleString();
+    
+    const note = document.getElementById('audit_note');
+    if (inel > 0) {
+        note.innerText = "⚠ Alert: $" + inel.toLocaleString() + " in ineligible costs removed from basis.";
+        note.style.color = "#b91c1c";
+    } else {
+        note.innerText = "Budget appears compliant with Section 9c Eligibility requirements.";
+        note.style.color = "#166534";
+    }
+}
+</script>
+
+</body>
+</html>
